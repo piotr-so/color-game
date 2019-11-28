@@ -6,9 +6,10 @@ import Summary from './components/summary/summary.component';
 
 function App() {
 
+  // starting values for development (to change!)
   const [gameProperties, setGameProperties] = useState({
-    rows: '2',
-    columns: '2'
+    rows: '4',
+    columns: '3'
   });
 
   const [screenToRender, setScreenToRender] = useState(0);
