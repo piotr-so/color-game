@@ -12,7 +12,8 @@ function App() {
     columns: '3'
   });
 
-  const [screenToRender, setScreenToRender] = useState(0);
+  //
+  const [screenToRender, setScreenToRender] = useState(1);
 
   const changeGameProperties = event => {
     event.preventDefault();
