@@ -1,9 +1,11 @@
-export const createGameBoard = (rows, cols) => {
+export const createGameBoard = (rows, cols, colors) => {
     const intRows = parseInt(rows);
     const intCols = parseInt(cols);
+    const colorsArray = ['198', '43', '152','70', '200', '250'];
+
     return (
         Array.from(Array(intRows), (n, k) =>
-            new Array(intCols).fill().map((val, idx) => [k, idx]))
+            new Array(intCols).fill().map((val, idx) => [k, idx, colorsArray[Math.floor(Math.random() * colorsArray.length)]]))
     )
 }
 
