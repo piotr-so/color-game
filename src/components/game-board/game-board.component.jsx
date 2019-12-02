@@ -4,30 +4,35 @@ import Cell from '../cell/cell.component';
 
 import { StyledBoard } from './game-board.styled';
 
-import { createGameBoard } from '../utils/utils';
+import { createGameBoard, colorsArray } from '../utils/utils';
 const GameBoard = ({ gameProperties: { rows, columns } }) => {
 
-    const [newBoard, setNewBoard] = useState(createGameBoard(rows, columns));
+    const [gameBoard, setGameBoard] = useState(createGameBoard(rows, columns));
+    const [areAnyMovesLeft, setareAnyMovesLeft] = useState(true);
+    const [score, setScore] = useState({
+        userScore: 0,
+        clicks: 0
+    });
+    const [preventAnotherClick, setPreventAnotherClick] = useState(false);
 
-
-    // static development variables for colors
-    const colorsArray = ['198', '43', '152', '70', '200', '250'];
-    const testColorArray = [
-        [[0, 0, '152'], [0, 1, '152'], [0, 2, '43']],
-        [[1, 0, '152'], [1, 1, '152'], [1, 2, '152']],
-        [[2, 0, '43'], [2, 1, '198'], [2, 2, '198']],
-        [[3, 0, '198'], [3, 1, '43'], [3, 2, '198']]
-    ];
-
-    const [testBoard, setTestBoard] = useState(createGameBoard(rows, columns));
+    const delayValuesForBoardIterations = {
+        greyCellsAppear: 500,
+        subsequentPulls: 50
+    }
 
     //
+
+    useEffect(() => {
+        if (!areAnyMovesLeft) console.log("game finished - no more moves left")
+    }, [areAnyMovesLeft]);
 
     // Hex test variables
     // const test = randomColorArray();
     // const colorsArray = [randomHexColorGen(), randomHexColorGen(), randomHexColorGen(), randomHexColorGen()];
 
-    const handleCellClick = (event, eventTargetPosX, eventTargetPosY, eventTargetColor, stateBoard) => {
+    const handleCellClick = (event, eventTargetPosX, eventTargetPosY, eventTargetColor, stateBoard, isBlocked) => {
+        if(!isBlocked) setPreventAnotherClick(true);
+        else return;
 
         // check if surrounding cells match color with target
         // if there are matching cells -> fill array with them, otherwise => undefined
@@ -36,24 +41,77 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
         if (foundCellsArray !== undefined) {
             // #1 Change color for found elements to grey and update state array
             const boardWithcolorEmptiedCells = greyOutFoundCells(foundCellsArray, stateBoard);
-            setTestBoard(boardWithcolorEmptiedCells);
+            setGameBoard(boardWithcolorEmptiedCells);
+            setScore({
+                ...score,
+                userScore: score.userScore + foundCellsArray.length,
+                clicks: score.clicks + 1
+            })
 
             const timeoutThisFn = (delayVal) => {
                 return new Promise(resolve => {
-                    setTimeout(() => resolve(fillEmptyColorCells(testBoard)), delayVal);
+                    setTimeout(() => resolve(fillEmptyColorCells(gameBoard)), delayVal);
                 });
             }
             const dispatchFillEmptyColorCells = async (delayVal) => {
                 console.log('Waiting for status');
+
+                // sequence of switching cells colors
                 const updatedGameBoardArr = await timeoutThisFn(delayVal);
+
                 if (updatedGameBoardArr[1] > 0) {
-                    setTestBoard(updatedGameBoardArr[0]);
-                    dispatchFillEmptyColorCells(100);
+                    setGameBoard(updatedGameBoardArr[0]);
+                    // subsequent iterations with diffrent from first delay
+                    dispatchFillEmptyColorCells(delayValuesForBoardIterations.subsequentPulls);
                 }
-                else return console.log('finished');
+                else if (updatedGameBoardArr[1] === 0) {
+                    // check if there are any moves left for player
+                    const checkBoardForPossibleMoves = (arrayToCheckAfterUpdate) => {
+
+                        const checkingLoop = (arrayToCheck) => {
+                            let possibilities = undefined;
+                            for (let i = 0; i < arrayToCheck.length; i++) {
+                                for (let y = 0; y < arrayToCheck[i].length - 1; y++) {
+                                    // console.log(`iteration: row-${i} col-${y}`);
+                                    // console.log(arrayToCheck[y][2]);
+                                    if (arrayToCheck[i][y][2] === arrayToCheck[i][y + 1][2]) possibilities = true;
+
+                                }
+                                if (possibilities === true) break;
+                            }
+                            if (possibilities === true) return true;
+                            else return false;
+                        }
+
+                        const transposeArray = (array) => {
+                            return array[0].map((col, i) => array.map(row => row[i]));
+                        }
+                        const transposedArrayToCheck = transposeArray(arrayToCheckAfterUpdate);
+
+                        const checkedRows = checkingLoop(arrayToCheckAfterUpdate);
+                        const checkedCols = checkingLoop(transposedArrayToCheck);
+                        console.log(checkedRows);
+                        console.log(checkedCols);
+                        if (checkedRows === true || checkedCols === true) {
+                            console.log(`there is possiblity in rows-${checkedRows} - cols-${checkedCols}`)
+                        }
+                        else {
+                            console.log('no possibilities');
+                            setareAnyMovesLeft(false);
+                        };
+                    }
+                    checkBoardForPossibleMoves(updatedGameBoardArr[0]);
+
+                    setPreventAnotherClick(false);
+                    return console.log('finished');
+                }
             };
-            // #2 Begin sequence of switching and filling colors
-            dispatchFillEmptyColorCells(500);
+            // #2 Begin sequence of switching and filling colors (value of first delay)
+            dispatchFillEmptyColorCells(delayValuesForBoardIterations.greyCellsAppear);
+        }
+        else {
+            setPreventAnotherClick(false);
+            return;
         }
     }
 
@@ -81,133 +139,67 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
             // element doesn't exist
             return false;
         }
-        
+
         // scaning function to find cells matching color with target
         const scan = (targetPosX, targetPosY, targetColor) => {
             const up = targetPosX - 1;
             const down = targetPosX + 1;
             const left = targetPosY - 1;
             const right = targetPosY + 1;
+            
 
-            // *** REFACTORING ***
-            // const checkUpOrDown = (direction) => {
-            //     if (stateBoard[up] !== undefined) {
-            //         console.log(`${up} jest`)
-            //         //above element exists
-
-            //         if (stateBoard[up][targetPosY][2] === targetColor) {
-            //             //color matches
-
-            //             const benchmark = stateBoard[up][targetPosY];
-
-            //             if (!checkELemExistence(surroundingsColors, benchmark)) {
-            //                 //if the same value doesn't exist push new element to array
-
-            //                 surroundingsColors.push([up, targetPosY, targetColor])
-            //             }
-            //         }
-            // }
-            // ***
-
-            if (stateBoard[up] !== undefined) {
-                //above element exists
-
-                if (stateBoard[up][targetPosY][2] === targetColor) {
-                    //color matches
-                    console.log(`góra istnieje i ma równy kolor`)
-
-
-                    const benchmark = stateBoard[up][targetPosY];
-
-                    if (!checkELemExistence(surroundingsColors, benchmark)) {
-                        //if the same value doesn't exist push new element to array
-
-                        surroundingsColors.push([up, targetPosY, targetColor])
+            const checkUpOrDown = (direction) => {
+                if (stateBoard[direction] !== undefined) {
+                    //above or below element exists
+    
+                    if (stateBoard[direction][targetPosY][2] === targetColor) {
+                        //color matches
+    
+                        const benchmark = stateBoard[direction][targetPosY];
+    
+                        if (!checkELemExistence(surroundingsColors, benchmark)) {
+                            //if the same value doesn't exist push new element to array
+    
+                            surroundingsColors.push([direction, targetPosY, targetColor])
+                        }
                     }
                 }
-                else console.log('góra istnieje - kolor inny')
             }
-            else console.log('góra nie istnieje');
-
-            if (stateBoard[down] !== undefined) {
-                //below element exists
-
-                if (stateBoard[down][targetPosY][2] === targetColor) {
-                    //color matches
-                    console.log(`dół istnieje i ma równy kolor`)
-
-
-                    const benchmark = stateBoard[down][targetPosY];
-
-                    if (!checkELemExistence(surroundingsColors, benchmark)) {
-                        //if the same value doesn't exist push new element to array
-
-                        surroundingsColors.push([down, targetPosY, targetColor])
+            const checkLeftOrRight = (direction) => {
+                if (stateBoard[targetPosX][direction] !== undefined) {
+                    //left or right element exists
+    
+                    if (stateBoard[targetPosX][direction][2] === targetColor) {
+                        //color matches
+                        // console.log(`lewy istnieje i ma równy kolor`)
+    
+                        const benchmark = stateBoard[targetPosX][direction];
+    
+                        if (!checkELemExistence(surroundingsColors, benchmark)) {
+                            //if the same value doesn't exist push new element to array
+    
+                            surroundingsColors.push([targetPosX, direction, targetColor])
+                        }
                     }
                 }
-                else console.log('dół istnieje - kolor inny')
-
-                // console.log('dół jest')
-                // if (stateBoard[down][targetPosY][2] === targetColor) {
-                //     surroundingsColors.push([down, targetPosY, targetColor]);
-                // }
             }
-            else console.log('dół nie istnieje');
 
-            if (stateBoard[targetPosX][left] !== undefined) {
-                //left element exists
-
-                if (stateBoard[targetPosX][left][2] === targetColor) {
-                    //color matches
-                    console.log(`lewy istnieje i ma równy kolor`)
-
-                    const benchmark = stateBoard[targetPosX][left];
-
-                    if (!checkELemExistence(surroundingsColors, benchmark)) {
-                        //if the same value doesn't exist push new element to array
-
-                        surroundingsColors.push([targetPosX, left, targetColor])
-                    }
-                }
-                else console.log('lewy istnieje - kolor inny')
-
-
-                // if (stateBoard[targetPosX][left][2] === targetColor) {
-                //     surroundingsColors.push([targetPosX, left, targetColor]);
-                // }
-            }
-            else console.log('lewy nie istnieje');
-
-            if (stateBoard[targetPosX][right] !== undefined) {
-                //right element exists
-
-                if (stateBoard[targetPosX][right][2] === targetColor) {
-                    //color matches
-                    console.log(`prawy istnieje i ma równy kolor`)
-
-                    const benchmark = stateBoard[targetPosX][right];
-
-                    if (!checkELemExistence(surroundingsColors, benchmark)) {
-                        //if the same value doesn't exist push new element to array
-
-                        surroundingsColors.push([targetPosX, right, targetColor])
-                    }
-                }
-                else console.log('prawy istnieje - kolor inny')
-            }
-            else console.log('prawy nie istnieje');
+            checkUpOrDown(up);
+            checkUpOrDown(down);
+            checkLeftOrRight(left);
+            checkLeftOrRight(right);
 
             // return surroundingsColors array filled with cells matching color with target (result of scan =>)
             return surroundingsColors;
         }
-        
+
         // first element in surroundingsColors array is filled with target position
         const surroundingsColors = [[eventTargetPosX, eventTargetPosY, eventTargetColor]];
 
         // *** checkSurroundingCells execution start ***
         // #1 Find if there are cells matching color with target
         scan(eventTargetPosX, eventTargetPosY, eventTargetColor);
-        console.log('Skanowanie #1');
+        // console.log('Skanowanie #1');
 
         // #2 if there are no cells matching color with target then checkSurroundingCells => undefined
         // -- surroundingsColors.length will match at least 1, because array is filled with target --
@@ -216,7 +208,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
         else {
             for (let i = 1; i < surroundingsColors.length; i++) {
                 scan(surroundingsColors[i][0], surroundingsColors[i][1], surroundingsColors[i][2]);
-                console.log('Skanowanie #' + (i + 1))
+                // console.log('Skanowanie #' + (i + 1))
             }
         }
         // #4 checkSurroundingCells => filled surroundingsColors array
@@ -236,8 +228,8 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
         return newBoard;
     }
 
-    const fillEmptyColorCells = (testBoardFromState) => {
-        const updatedGameBoard = [...testBoardFromState];
+    const fillEmptyColorCells = (boardFromState) => {
+        const updatedGameBoard = [...boardFromState];
         let colorEmptiedCellsArray = [];
         let cellsToPullColorFrom = [];
 
@@ -301,7 +293,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
         }
         // if there are no cells to pull from, and there are no 'emptied color' cells => condition to stop filling
         if (cellsToPullColorFrom.length === 0 && colorEmptiedCellsArray.length === 0) {
-            return [0];
+            return [updatedGameBoard, 0];
         }
     }
 
@@ -309,7 +301,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
         <div>
             <div>GameBoard</div>
             <StyledBoard rows={rows} cols={columns}>
-                {testBoard.map(
+                {gameBoard.map(
                     row => row.map(
                         (cell, idx) => (
                             <Cell
@@ -319,12 +311,24 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
                                 randColor={
                                     cell[2]
                                 }
-                                onClickFn={event => handleCellClick(event, cell[0], cell[1], cell[2], testBoard)}
+                                onClickFn={
+                                event => handleCellClick(event, cell[0], cell[1], cell[2], gameBoard, preventAnotherClick)
+
+                            }
                             />
+
                         )
                     )
                 )
                 }
+                {!areAnyMovesLeft ? (
+                    <div>Game finished</div>
+                )
+                    : undefined}
+                <div>
+                    <div>Score: {score.userScore}</div>
+                    <div>Clicks: {score.clicks}</div>
+                </div>
                 {/* {newBoard.map(
                     row => row.map(
                         (cell, idx) => (

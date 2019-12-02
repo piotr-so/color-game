@@ -8,8 +8,8 @@ function App() {
 
   // starting values for development (to change!)
   const [gameProperties, setGameProperties] = useState({
-    rows: '4',
-    columns: '3'
+    rows: '5',
+    columns: '5'
   });
 
   //
