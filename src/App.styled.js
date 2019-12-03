@@ -5,14 +5,14 @@ export const AppWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 50vh;
-    padding: 20px 60px;
-
-    > * {
-        margin-bottom: 20px;
-    }
 `;
 
 export const Header = styled.header`
     font-size: 50px;
+    font-family: 'Orbitron';
+    font-weight: 700;
+    margin: 20px 0;
+    @media (max-width: 480px) {
+        font-size: 30px; 
+    }
 `;

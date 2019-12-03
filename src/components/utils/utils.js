@@ -2,7 +2,7 @@ export const createGameBoard = (rows, cols, colors) => {
     const intRows = parseInt(rows);
     const intCols = parseInt(cols);
     // vv to change
-    const colorsArray = ['198', '43', '152','70', '200', '250'];
+    
 
     return (
         Array.from(Array(intRows), (n, k) =>
@@ -10,7 +10,7 @@ export const createGameBoard = (rows, cols, colors) => {
     )
 }
 
-export const colorsArray = ['198', '43', '152','70', '200', '250'];
+export const colorsArray = ['0', '27', '59','103', '170', '229', '268', '312'];
 
 // Hex variant random color generator (experimental)
 // if generated hex value will be shorter than 6, slice(-6) will return value with additional '0's

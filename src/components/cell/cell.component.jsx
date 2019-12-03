@@ -6,7 +6,7 @@ const Cell = ({ posX, posY, randColor, onClickFn }) => {
 
     return (
         <StyledCell color={randColor} onClick={onClickFn} posX={posX} posY={posY}>
-            [{posX}, {posY}]
+        
         </StyledCell>
     )
 }

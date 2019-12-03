@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 import Cell from '../cell/cell.component';
+import UserScore from '../userScore/userScore.component';
+import GameFinishModal from '../game-finish/game-finish.component';
 
-import { StyledBoard } from './game-board.styled';
+import { StyledBoard, BoardWrapper } from './game-board.styled';
 
 import { createGameBoard, colorsArray } from '../utils/utils';
 const GameBoard = ({ gameProperties: { rows, columns } }) => {
@@ -11,15 +13,19 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
     const [areAnyMovesLeft, setareAnyMovesLeft] = useState(true);
     const [score, setScore] = useState({
         userScore: 0,
+        addedScore: ``,
+        addedScoreCssHelper: true,
         clicks: 0
     });
+
     const [preventAnotherClick, setPreventAnotherClick] = useState(false);
 
     const delayValuesForBoardIterations = {
-        greyCellsAppear: 500,
+        greyCellsAppear: 100,
         subsequentPulls: 50
     }
 
+    const emptiedCellColor = `#a3a3a3`;
     //
 
     useEffect(() => {
@@ -31,7 +37,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
     // const colorsArray = [randomHexColorGen(), randomHexColorGen(), randomHexColorGen(), randomHexColorGen()];
 
     const handleCellClick = (event, eventTargetPosX, eventTargetPosY, eventTargetColor, stateBoard, isBlocked) => {
-        if(!isBlocked) setPreventAnotherClick(true);
+        if (!isBlocked) setPreventAnotherClick(true);
         else return;
 
         // check if surrounding cells match color with target
@@ -45,6 +51,8 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
             setScore({
                 ...score,
                 userScore: score.userScore + foundCellsArray.length,
+                addedScore: `+${foundCellsArray.length}`,
+                addedScoreCssHelper: !score.addedScoreCssHelper,
                 clicks: score.clicks + 1
             })
 
@@ -146,20 +154,20 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
             const down = targetPosX + 1;
             const left = targetPosY - 1;
             const right = targetPosY + 1;
-            
+
 
             const checkUpOrDown = (direction) => {
                 if (stateBoard[direction] !== undefined) {
                     //above or below element exists
-    
+
                     if (stateBoard[direction][targetPosY][2] === targetColor) {
                         //color matches
-    
+
                         const benchmark = stateBoard[direction][targetPosY];
-    
+
                         if (!checkELemExistence(surroundingsColors, benchmark)) {
                             //if the same value doesn't exist push new element to array
-    
+
                             surroundingsColors.push([direction, targetPosY, targetColor])
                         }
                     }
@@ -168,16 +176,16 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
             const checkLeftOrRight = (direction) => {
                 if (stateBoard[targetPosX][direction] !== undefined) {
                     //left or right element exists
-    
+
                     if (stateBoard[targetPosX][direction][2] === targetColor) {
                         //color matches
                         // console.log(`lewy istnieje i ma równy kolor`)
-    
+
                         const benchmark = stateBoard[targetPosX][direction];
-    
+
                         if (!checkELemExistence(surroundingsColors, benchmark)) {
                             //if the same value doesn't exist push new element to array
-    
+
                             surroundingsColors.push([targetPosX, direction, targetColor])
                         }
                     }
@@ -223,7 +231,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
         for (let i = 0; i < foundElementsArray.length; i++) {
             const posX = foundElementsArray[i][0];
             const posY = foundElementsArray[i][1];;
-            newBoard[posX][posY][2] = 'grey';
+            newBoard[posX][posY][2] = emptiedCellColor;
         }
         return newBoard;
     }
@@ -236,7 +244,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
         for (let i = 0; i < updatedGameBoard.length; i++) {
 
             for (let y = 0; y < updatedGameBoard[i].length; y++) {
-                if (updatedGameBoard[i][y][2] === 'grey') {
+                if (updatedGameBoard[i][y][2] === emptiedCellColor) {
                     const posX = updatedGameBoard[i][y][0];
                     const posY = updatedGameBoard[i][y][1];
                     // color needed for further replacing 'empty color' in last iteration
@@ -275,7 +283,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
                     const providerColor = newBoardAfterPulls[posXProvider][posYProvider][2];
 
                     newBoardAfterPulls[posXReceiver][posYReceiver][2] = providerColor;
-                    newBoardAfterPulls[posXProvider][posYProvider][2] = 'grey';
+                    newBoardAfterPulls[posXProvider][posYProvider][2] = emptiedCellColor;
                 }
 
                 break;
@@ -298,8 +306,8 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
     }
 
     return (
-        <div>
-            <div>GameBoard</div>
+        <BoardWrapper>
+            <UserScore score={score} />
             <StyledBoard rows={rows} cols={columns}>
                 {gameBoard.map(
                     row => row.map(
@@ -312,23 +320,16 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
                                     cell[2]
                                 }
                                 onClickFn={
-                                event => handleCellClick(event, cell[0], cell[1], cell[2], gameBoard, preventAnotherClick)
+                                    event => handleCellClick(event, cell[0], cell[1], cell[2], gameBoard, preventAnotherClick)
 
-                            }
+                                }
                             />
 
                         )
                     )
                 )
                 }
-                {!areAnyMovesLeft ? (
-                    <div>Game finished</div>
-                )
-                    : undefined}
-                <div>
-                    <div>Score: {score.userScore}</div>
-                    <div>Clicks: {score.clicks}</div>
-                </div>
+
                 {/* {newBoard.map(
                     row => row.map(
                         (cell, idx) => (
@@ -344,7 +345,11 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
                     )
                 )} */}
             </StyledBoard>
-        </div>
+            {!areAnyMovesLeft ? (
+                <GameFinishModal score={score}/>
+            )
+                : undefined}
+        </BoardWrapper>
     )
 }
 
