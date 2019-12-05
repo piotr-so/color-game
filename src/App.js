@@ -5,16 +5,15 @@ import GameBoard from './components/game-board/game-board.component';
 
 function App() {
 
-  // starting values for development (to change!)
   const [gameProperties, setGameProperties] = useState({
-    rows: 8,
-    columns: 8
+    rows: 3,
+    columns: 3,
+    difficulty: 3
   });
 
-  //
   const [screenToRender, setScreenToRender] = useState(0);
 
-  const changeGameProperties = event => {
+  const changeBoardProperties = event => {
     event.preventDefault();
     const { name } = event.target;
     const value = parseInt(event.target.value);
@@ -31,18 +30,30 @@ function App() {
         [name]: value
       })
     }
-
-
   }
 
-  const checkValoNBlur = (event) => {
-    const {name, value} = event.target
-    if(value === '' || value < 3) {
+  const changeGameDifficulty = event => {
+    const { value } = event.target;
+    const parsedVal = parseInt(value);
+    setGameProperties({
+      ...gameProperties,
+      difficulty: parsedVal
+    })
+  }
+
+  const changeGamePropertiesSimpleGame = (difficulty) => {
+    if(difficulty === 'easy') {setGameProperties({ rows: 5, columns: 5, difficulty: 3}); setScreenToRender(1)}
+    if(difficulty === 'medium') {setGameProperties({ rows: 6, columns: 6, difficulty: 5}); setScreenToRender(1)}
+    if(difficulty === 'hard') {setGameProperties({ rows: 8, columns: 8, difficulty: 8}); setScreenToRender(1)}
+  }
+
+  const checkValOnBlur = (event) => {
+    const { name, value } = event.target
+    if (value === '' || value < 3) {
       setTimeout(() => setGameProperties({
         ...gameProperties,
         [name]: 3
       }), 50)
-      
     }
   }
 
@@ -67,20 +78,22 @@ function App() {
     }
   }
 
-  const switchScreen = () => {
-    setScreenToRender(screenToRender + 1)
+  const switchScreen = (command) => {
+    if (command === 'restartGame') setScreenToRender(0);
+    else if (command === 'startGame') setScreenToRender(1);
   }
 
   const Screens = [
     <StartScreen
-      changeGameProperties={changeGameProperties}
+      changeBoardProperties={changeBoardProperties}
+      changeGameDifficulty={changeGameDifficulty}
+      changeGamePropertiesSimpleGame={changeGamePropertiesSimpleGame}
       gameProperties={gameProperties}
-      startGame={switchScreen}
+      switchScreen={switchScreen}
       incrOrDecrInputVal={incrOrDecrInputVal}
-      checkValoNBlur={checkValoNBlur}
+      checkValOnBlur={checkValOnBlur}
     />,
-    <GameBoard gameProperties={gameProperties} />,
-    // <Summary />
+    <GameBoard gameProperties={gameProperties} switchScreen={switchScreen} />,
   ];
 
   return (

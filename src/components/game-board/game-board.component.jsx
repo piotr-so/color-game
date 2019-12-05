@@ -4,13 +4,13 @@ import Cell from '../cell/cell.component';
 import UserScore from '../userScore/userScore.component';
 import GameFinishModal from '../game-finish/game-finish.component';
 
-import { StyledBoard, BoardWrapper } from './game-board.styled';
+import { StyledBoard, ResignButton } from './game-board.styled';
 
 import { createGameBoard, colorsArray } from '../utils/utils';
-const GameBoard = ({ gameProperties: { rows, columns } }) => {
+const GameBoard = ({ gameProperties: { rows, columns, difficulty }, switchScreen }) => {
 
-    const [gameBoard, setGameBoard] = useState(createGameBoard(rows, columns));
-    const [areAnyMovesLeft, setareAnyMovesLeft] = useState(true);
+    const [gameBoard, setGameBoard] = useState(createGameBoard(rows, columns, difficulty));
+    const [areAnyMovesLeft, setAreAnyMovesLeft] = useState(true);
     const [score, setScore] = useState({
         userScore: 0,
         addedScore: ``,
@@ -105,7 +105,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
                         }
                         else {
                             console.log('no possibilities');
-                            setareAnyMovesLeft(false);
+                            setAreAnyMovesLeft(false);
                         };
                     }
                     checkBoardForPossibleMoves(updatedGameBoardArr[0]);
@@ -263,7 +263,7 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
                 for (let i = 0; i < colorEmptiedCellsArray.length; i++) {
                     const posX = colorEmptiedCellsArray[i][0];
                     const posY = colorEmptiedCellsArray[i][1];
-                    const newColor = colorsArray[Math.floor(Math.random() * colorsArray.length)];
+                    const newColor = colorsArray[Math.floor(Math.random() * difficulty)];
 
                     newBoardAfterColorChange[posX][posY][2] = newColor;
                 }
@@ -306,22 +306,19 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
     }
 
     return (
-        <BoardWrapper>
+        <>
             <UserScore score={score} />
             <StyledBoard rows={rows} cols={columns}>
-                {gameBoard.map(
+                {gameBoard !== undefined && gameBoard.map(
                     row => row.map(
                         (cell, idx) => (
                             <Cell
                                 key={idx}
                                 posX={cell[0]}
                                 posY={cell[1]}
-                                randColor={
-                                    cell[2]
-                                }
+                                randColor={cell[2]}
                                 onClickFn={
                                     event => handleCellClick(event, cell[0], cell[1], cell[2], gameBoard, preventAnotherClick)
-
                                 }
                             />
 
@@ -329,27 +326,14 @@ const GameBoard = ({ gameProperties: { rows, columns } }) => {
                     )
                 )
                 }
-
-                {/* {newBoard.map(
-                    row => row.map(
-                        (cell, idx) => (
-                            <Cell
-                                key={idx}
-                                posX={cell[0]}
-                                posY={cell[1]}
-                                randColor={
-                                    colorsArray[Math.floor(Math.random() * colorsArray.length)]
-                                }
-                            />
-                        )
-                    )
-                )} */}
             </StyledBoard>
+            <ResignButton onClick={() => setAreAnyMovesLeft(false)}>Give up?</ResignButton>
             {!areAnyMovesLeft ? (
-                <GameFinishModal score={score}/>
+                <GameFinishModal score={score} switchScreen={switchScreen} />
             )
-                : undefined}
-        </BoardWrapper>
+                : undefined
+            }
+        </>
     )
 }
 

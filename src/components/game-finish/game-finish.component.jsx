@@ -1,22 +1,23 @@
 import React from 'react';
 
-import { GameFinishModal, Wrapper, GameOver, Summary, PlayAgain, Value } from './game-finish.styled';
-import Userscore from '../userScore/userScore.component';
+import { GameFinish, GameOver, Summary, Value } from './game-finish.styled';
+import StyledContainer from '../styled-container/styled-container.component';
+import PlayAgain from '../custom-button/custom-button.component';
 
 
-const GameFinish = ({ score }) => (
-    <GameFinishModal>
-        <Wrapper>
+const GameFinishModal = ({ score: { userScore, clicks }, switchScreen }) => (
+    <GameFinish>
+        <StyledContainer>
             <GameOver>Game over</GameOver>
             <Summary>
                 <div>You've scored:</div>
-                <div><Value>{score.userScore}</Value> points</div>
+                <div><Value>{userScore}</Value> points</div>
                 <div>in</div>
-                <div><Value>{score.clicks}</Value> moves</div>
+                <div><Value>{clicks}</Value> moves</div>
             </Summary>
-            <PlayAgain>Play again?</PlayAgain>
-        </Wrapper>
-    </GameFinishModal>
+            <PlayAgain func={() => switchScreen('restartGame')}>Play again?</PlayAgain>
+        </StyledContainer>
+    </GameFinish>
 )
 
-export default GameFinish;
+export default GameFinishModal;
