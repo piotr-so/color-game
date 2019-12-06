@@ -9,7 +9,7 @@ export const AppWrapper = styled.div`
 
 export const Header = styled.header`
     font-size: 50px;
-    font-family: 'Orbitron';
+    font-family: 'Orbitron', Arial, sans-serif;
     font-weight: 700;
     margin: 20px 0;
     @media (max-width: 480px) {

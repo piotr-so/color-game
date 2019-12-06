@@ -2,13 +2,14 @@ import React from 'react';
 
 import { UserScoreWrapper, Score, AddedScore } from './userScore.styled';
 
-const UserScore = ({ score: { userScore, clicks, addedScore, addedScoreCssHelper } }) => (
+const UserScore = ({ score: { userScore, addedScore, addedScoreCssHelper } }) => (
     <UserScoreWrapper>
-        <Score>Score: {userScore}
-            <AddedScore key={
-                `${addedScore}${addedScoreCssHelper === true ? 'Y' : 'N'}`
-                }
-                >{addedScore}</AddedScore>
+        <Score>Score: <span>{userScore}</span>
+            <AddedScore
+                key={`${addedScore}${addedScoreCssHelper === true ? 'Y' : 'N'}`}
+            >
+                {addedScore}
+            </AddedScore>
         </Score>
     </UserScoreWrapper>
 )
