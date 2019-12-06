@@ -3,6 +3,8 @@
 ## Overview
 Simple brick type game created with React and Styled-components.
 
+Live demo available [here](https://piotr-so.github.io/color-game/).
+
 ## Running the app
 
 #### 1. Clone repository and install all dependencies.
