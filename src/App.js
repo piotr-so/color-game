@@ -42,7 +42,7 @@ function App() {
   }
 
   const changeGamePropertiesSimpleGame = (difficulty) => {
-    if(difficulty === 'easy') {setGameProperties({ rows: 5, columns: 5, difficulty: 3}); setScreenToRender(1)}
+    if(difficulty === 'easy') {setGameProperties({ rows: 4, columns: 4, difficulty: 3}); setScreenToRender(1)}
     if(difficulty === 'medium') {setGameProperties({ rows: 6, columns: 6, difficulty: 5}); setScreenToRender(1)}
     if(difficulty === 'hard') {setGameProperties({ rows: 8, columns: 8, difficulty: 8}); setScreenToRender(1)}
   }

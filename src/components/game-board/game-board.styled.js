@@ -1,8 +1,7 @@
-import styled, {keyframes} from 'styled-components/macro';
+import styled, { css, keyframes } from 'styled-components/macro';
 
 export const StyledBoard = styled.div`
     display: grid;
-    justify-content: center;
     padding: 10px;
     border-radius: 15px;
     grid-template-rows: repeat(
@@ -13,7 +12,6 @@ export const StyledBoard = styled.div`
         ${props => props.cols},
         minmax(40px, 50px)
     );
-    /* background: #a3a3a3; */
     background:
         radial-gradient(black -20%, transparent 16%) 0 0,
         radial-gradient(black -20%, transparent 16%) 8px 8px,
@@ -24,8 +22,7 @@ export const StyledBoard = styled.div`
     grid-gap: 3px;
 
     @media (max-width: 480px) {
-        margin: 0 10px;
-        justify-content: center;
+        width: calc(${props => props.rows} * 43px);
         grid-template-rows: repeat(
             ${props => props.rows},
             minmax(40px, 1fr)
@@ -36,6 +33,7 @@ export const StyledBoard = styled.div`
             minmax(40px, 1fr)
         ); 
     }
+    
 `;
 
 export const shake = keyframes`
@@ -68,5 +66,14 @@ export const ResignButton = styled.button`
         cursor: pointer;
         animation: ${shake} 0.82s cubic-bezier(.36,.07,.19,.97) both;
         
+    }
+`;
+
+export const BoardOverflowControler = styled.div`
+    ${props => props.rows > 8 ? css`
+        width: 100%;
+        overflow-x: auto;
+    `
+    : undefined
     }
 `;
