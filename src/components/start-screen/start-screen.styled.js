@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components/macro';
+import { RainbowBorder } from '../styled-container/styled-container.styled';
 
 export const StartGameWrap = styled.div`
     position: relative;
@@ -15,11 +16,14 @@ export const Input = styled.input`
     &[type=number]::-webkit-inner-spin-button,
     [type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
+        -moz-appearance: textfield;
+        appearance: none;
         margin: 0;
     }
     &[type=number] {
         border: 2px solid rgba(0,0,0, .1);
         border-radius: 4px;
+        -moz-appearance: textfield;
     }
 `;
 
@@ -109,21 +113,21 @@ export const IconContainer = styled.div`
             left: 0;
             margin-bottom: 15px;
     `) : (
-        css`
+            css`
             bottom: 0;
             padding: 0 15px 15px 0;
             right: 0;
     `)
     }
     svg {
-        width: 50px;
-        height: 50px;
-        transition: fill .3s ease-in-out;
+        width: 40px;
+        height: 40px;
+        transition: fill .2s ease-in-out;
 
         &:hover {
             cursor: pointer;
             ${props => props.top ? css`fill: rgba(0, 43, 255, .8);` : css`fill: rgba(68, 191, 46, .8);`
-        }
+    }
     }
 `;
 
@@ -151,6 +155,8 @@ export const InfoWrapper = styled.div`
     background-color: white;
     border-radius: 15px;
     
+    ${RainbowBorder}
+
     @media (max-width: 480px) {
         width: 80%;
     }
@@ -160,33 +166,6 @@ export const InfoWrapper = styled.div`
         max-height: 70vh;
     }
 
-    &::before {
-        content: '';
-        background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-        position: absolute;
-        top: -5px;
-        left: -5px;
-        width: calc(100% + 10px);
-        height: calc(100% + 10px);
-        z-index: -1;
-        filter: blur(5px);
-        opacity: 1;
-        transition: opacity .3s ease-in-out;
-        border-radius: 15px;
-    }
-
-
-    &::after {
-        z-index: -1;
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: white;
-        left: 0;
-        top: 0;
-        border-radius: 10px;
-    }
 
     h1 {
         font-weight: bold;
@@ -218,7 +197,7 @@ export const ConfirmButton = styled.button`
     border: 2px solid rgba(0,0,0,.6);
     background-color: transparent;
     padding: 5px 10px;
-    transition: border .3s ease-in-out, color .3s ease-in-out;
+    transition: border .3s ease-in-out, color .2s ease-in-out;
 
     @media (max-width: 480px) {
         border: 2px solid rgba(68, 191, 46, .8);

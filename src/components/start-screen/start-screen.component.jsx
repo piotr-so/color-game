@@ -105,7 +105,7 @@ const StartScreen = ({
                 <InfoModal>
                     <InfoWrapper>
                         <h1>How to play?</h1>
-                        <span>All you need to do is to click on the same color blocks, to crush them.</span>
+                        <span>All you need to do is to click on the same color blocks to crush them.</span>
                         <span>There should be at least two identical next to each other.</span>
                         <span>Gain points for each one crushed and try not to lose all possible moves.</span>
                         <span>Remember: the more you match, the better your score.</span>

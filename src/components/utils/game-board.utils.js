@@ -1,3 +1,5 @@
+export const colorsArray = ['0', '27', '59', '103', '170', '229', '268', '312'];
+
 export const createGameBoard = (rows, cols, difficulty) => {
     const intRows = parseInt(rows);
     const intCols = parseInt(cols);
@@ -41,19 +43,14 @@ const checkBoardForPossibleMoves = (arrayToCheckAfterUpdate) => {
 
     const checkedRows = checkingLoop(arrayToCheckAfterUpdate);
     const checkedCols = checkingLoop(transposedArrayToCheck);
-    // console.log(checkedRows);
-    // console.log(checkedCols);
     if (checkedRows === true || checkedCols === true) {
-        // console.log(`there is possiblity in rows-${checkedRows} - cols-${checkedCols}`)
         return true;
     }
     else {
-        // console.log('no possibilities');
         return false;
     };
 }
 
-export const colorsArray = ['0', '27', '59', '103', '170', '229', '268', '312'];
 
 export const checkSurroundingCells = (eventTargetPosX, eventTargetPosY, eventTargetColor, stateBoard) => {
 
@@ -106,17 +103,12 @@ export const checkSurroundingCells = (eventTargetPosX, eventTargetPosY, eventTar
         }
         const checkLeftOrRight = (direction) => {
             if (stateBoard[targetPosX][direction] !== undefined) {
-                //left or right element exists
 
                 if (stateBoard[targetPosX][direction][2] === targetColor) {
-                    //color matches
-                    // console.log(`lewy istnieje i ma równy kolor`)
 
                     const benchmark = stateBoard[targetPosX][direction];
 
                     if (!checkELemExistence(surroundingsColors, benchmark)) {
-                        //if the same value doesn't exist push new element to array
-
                         surroundingsColors.push([targetPosX, direction, targetColor])
                     }
                 }
@@ -136,20 +128,22 @@ export const checkSurroundingCells = (eventTargetPosX, eventTargetPosY, eventTar
     const surroundingsColors = [[eventTargetPosX, eventTargetPosY, eventTargetColor]];
 
     // *** checkSurroundingCells execution start ***
+    
     // #1 Find if there are cells matching color with target
     scan(eventTargetPosX, eventTargetPosY, eventTargetColor);
-    // console.log('Skanowanie #1');
 
     // #2 if there are no cells matching color with target then checkSurroundingCells => undefined
     // -- surroundingsColors.length will match at least 1, because array is filled with target --
+
     if (surroundingsColors.length === 1) return;
+
     // #3 else fill array with cells matching color with target
     else {
         for (let i = 1; i < surroundingsColors.length; i++) {
             scan(surroundingsColors[i][0], surroundingsColors[i][1], surroundingsColors[i][2]);
-            // console.log('Skanowanie #' + (i + 1))
         }
     }
+
     // #4 checkSurroundingCells => filled surroundingsColors array
     return surroundingsColors;
     //
@@ -220,11 +214,6 @@ export const fillEmptyColorCells = (boardFromState, difficulty) => {
             break;
         }
     }
-
-    // console.log('cells to pull');
-    // console.log(cellsToPullColorFrom);
-    // console.log('color emptied cells')
-    // console.log(colorEmptiedCellsArray);
 
     // if there are still 'emptied color' cells
     if (colorEmptiedCellsArray.length > 0) {

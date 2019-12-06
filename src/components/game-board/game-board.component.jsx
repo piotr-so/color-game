@@ -25,10 +25,6 @@ const GameBoard = ({ gameProperties: { rows, columns, difficulty }, switchScreen
         subsequentPulls: 50
     }
 
-    // useEffect(() => {
-    //     if (!areAnyMovesLeft) console.log("game finished - no more moves left")
-    // }, [areAnyMovesLeft]);
-
     const handleCellClick = (event, eventTargetPosX, eventTargetPosY, eventTargetColor, stateBoard, isBlocked) => {
         if (!isBlocked) setPreventAnotherClick(true);
         else return;
@@ -38,7 +34,7 @@ const GameBoard = ({ gameProperties: { rows, columns, difficulty }, switchScreen
         const foundCellsArray = checkSurroundingCells(eventTargetPosX, eventTargetPosY, eventTargetColor, stateBoard);
 
         if (foundCellsArray !== undefined) {
-            // #1 Change color for found elements to grey and update state array
+            // #1 Remove color for found elements and update state array
             const boardWithcolorEmptiedCells = removeColorFromFoundCells(foundCellsArray, stateBoard);
             setGameBoard(boardWithcolorEmptiedCells);
             setScore({
@@ -55,7 +51,6 @@ const GameBoard = ({ gameProperties: { rows, columns, difficulty }, switchScreen
                 });
             }
             const dispatchFillEmptyColorCells = async (delayVal) => {
-                // console.log('Waiting for status');
 
                 // sequence of switching cells colors
                 const updatedGameBoardArr = await timeoutThisFn(delayVal);
@@ -73,10 +68,7 @@ const GameBoard = ({ gameProperties: { rows, columns, difficulty }, switchScreen
                             let possibilities = undefined;
                             for (let i = 0; i < arrayToCheck.length; i++) {
                                 for (let y = 0; y < arrayToCheck[i].length - 1; y++) {
-                                    // console.log(`iteration: row-${i} col-${y}`);
-                                    // console.log(arrayToCheck[y][2]);
                                     if (arrayToCheck[i][y][2] === arrayToCheck[i][y + 1][2]) possibilities = true;
-
                                 }
                                 if (possibilities === true) break;
                             }
@@ -91,21 +83,16 @@ const GameBoard = ({ gameProperties: { rows, columns, difficulty }, switchScreen
 
                         const checkedRows = checkingLoop(arrayToCheckAfterUpdate);
                         const checkedCols = checkingLoop(transposedArrayToCheck);
-                        // console.log(checkedRows);
-                        // console.log(checkedCols);
                         if (checkedRows === true || checkedCols === true) {
-                            // console.log(`there is possiblity in rows-${checkedRows} - cols-${checkedCols}`)
                             return;
                         }
                         else {
-                            // console.log('no possibilities');
                             setAreAnyMovesLeft(false);
                         };
                     }
                     checkBoardForPossibleMoves(updatedGameBoardArr[0]);
 
                     setPreventAnotherClick(false);
-                    // return console.log('finished changing colors in board');
                 }
             };
             // #2 Begin sequence of switching and filling colors (value of first delay)

@@ -70,10 +70,12 @@ export const ResignButton = styled.button`
 `;
 
 export const BoardOverflowControler = styled.div`
-    ${props => props.rows > 8 ? css`
+    @media (max-width: 480px) {
+        ${props => props.rows > 8 ? css`
         width: 100%;
         overflow-x: auto;
     `
     : undefined
+    }
     }
 `;
